@@ -4,5 +4,7 @@
     "username" : "root",
     "password" : "manager",
 
-    "user-host": "localhost:9001"
+    "user-host": "localhost:9001",
+    "service-host": "localhost:9000",
+    "60-days-key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTQ0NDUzMzIsImlkIjoibXJYWVpaemFidiJ9.0Hd4SpIELulSuTxGAeuCPl_A33X-KoPUpRmgK4dTphk"
 }

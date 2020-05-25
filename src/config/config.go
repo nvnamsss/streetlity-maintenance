@@ -10,11 +10,13 @@ import (
 )
 
 type Configuration struct {
-	Server   string
-	Database string `json:"dbname"`
-	Username string
-	Password string
-	UserHost string `json:"user-host"`
+	Server      string
+	Database    string `json:"dbname"`
+	Username    string
+	Password    string
+	UserHost    string `json:"user-host"`
+	Servicehost string `json:"service-host"`
+	SixtyDaysKey    string `json:"60-days-key"`
 }
 
 var Config Configuration
