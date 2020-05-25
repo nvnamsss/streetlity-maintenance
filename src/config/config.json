@@ -1,0 +1,8 @@
+{
+    "server" : "localhost:3306",
+    "dbname" : "services",
+    "username" : "root",
+    "password" : "manager",
+
+    "user-host": "localhost:9001"
+}

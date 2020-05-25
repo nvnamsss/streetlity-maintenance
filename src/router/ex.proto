@@ -1,0 +1,3 @@
+service Example {
+    rpc GetFeature(Point) returns (Feature) {}
+}
