@@ -1,4 +1,4 @@
-package maintenance
+package maintenance_test
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"streetlity-maintenance/model"
 	"streetlity-maintenance/srpc"
+	"testing"
 )
 
 func Order(common_user_id string, maintenance_user_ids []string, reason string, note string) (order model.MaintenanceOrder, e error) {
@@ -22,6 +23,7 @@ func Order(common_user_id string, maintenance_user_ids []string, reason string, 
 	order.Receiver = maintenance_user_ids[0]
 	for loop := 0; loop < receiver_length; loop++ {
 		order.Receiver += ";" + maintenance_user_ids[loop]
+
 	}
 
 	if order, e = model.AddOrder(order); e != nil {
@@ -58,4 +60,18 @@ func Order(common_user_id string, maintenance_user_ids []string, reason string, 
 	}
 
 	return
+}
+
+func TestOrder(t *testing.T) {
+	cUser := ""
+	receiver := []string{"god", "play"}
+	reason := ""
+	note := ""
+	order, e := Order(cUser, receiver, reason, note)
+
+	if e != nil {
+		log.Println(e.Error())
+	} else {
+		log.Println(order)
+	}
 }
