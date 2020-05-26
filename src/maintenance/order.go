@@ -32,7 +32,7 @@ func Order(common_user_id string, maintenance_user_ids []string, reason string, 
 	data_user := "user:" + common_user_id
 	data_reason := "reason:" + reason
 	data_note := "note:" + note
-
+	log.Println(order)
 	resp, e := srpc.RequestNotify(url.Values{
 		"id":            maintenance_user_ids,
 		"notify-tittle": {"Customer is on service"},

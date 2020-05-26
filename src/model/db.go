@@ -6,6 +6,7 @@ import (
 	"streetlity-maintenance/config"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/nvnamsss/goinf/event"
 )
