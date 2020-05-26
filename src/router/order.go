@@ -47,6 +47,7 @@ func requestOrder(w http.ResponseWriter, req *http.Request) {
 	if res.Status {
 		user_ids := p.GetString("Users")
 		reason := p.GetString("Reason")[0]
+
 		note := p.GetStringFirstOrDefault("Note")
 
 		maintenance.Order(user_ids, reason, note)
