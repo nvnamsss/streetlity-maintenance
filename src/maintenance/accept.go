@@ -24,5 +24,6 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 }
 
 func NotifyAccepted(order_id int64) {
-
+	order = model.MaintenanceOrder{Id: order_id}
+	if order, e = model 
 }
