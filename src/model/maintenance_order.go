@@ -13,6 +13,7 @@ const (
 	Waiting   = 0
 	Accepted  = 1
 	Completed = 2
+	Denied    = 3
 )
 
 type MaintenanceOrder struct {

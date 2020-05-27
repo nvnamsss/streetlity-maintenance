@@ -1,6 +1,11 @@
 package maintenance
 
-import "streetlity-maintenance/model"
+import (
+	"net/url"
+	"strconv"
+	"streetlity-maintenance/model"
+	"streetlity-maintenance/srpc"
+)
 
 //Deny remove the order, notify to the receiver user if it was accepted
 func Deny() (order model.MaintenanceOrder, e error) {
@@ -11,4 +16,19 @@ func Deny() (order model.MaintenanceOrder, e error) {
 
 	e = order.Delete()
 	return
+}
+
+//NotifyDenied send a notify to other maintenance users that the order is accepted by other
+func NotifyDenied(order model.MaintenanceOrder) {
+	receivers := []string{order.CommonUser}
+	data_id := "id:" + strconv.FormatInt(order.Id, 10)
+	data_action := "action:" + "Denied"
+	data_message := "message:" + "order is denied by maintenance user"
+
+	srpc.RequestNotify(url.Values{
+		"id":            receivers,
+		"notify-tittle": {""},
+		"notify-body":   {""},
+		"data":          {data_id, data_action, data_message},
+	})
 }
