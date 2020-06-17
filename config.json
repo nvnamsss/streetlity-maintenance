@@ -1,11 +1,11 @@
 {
-    "server" : "localhost:3306",
+    "server" : "mysql-streetlity-api:3306",
     "dbname" : "services",
     "username" : "root",
-    "password" : "manager",
+    "password" : "streetlity",
 
-    "user-host": "localhost:9001",
-    "service-host": "localhost:9000",
-    "driver-host": "localhost:9003",
+    "user-host": "35.240.232.218",
+    "service-host": "himom_api_container:9000",
+    "driver-host": "34.87.144.190",
     "60-days-key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1OTQ0NDUzMzIsImlkIjoibXJYWVpaemFidiJ9.0Hd4SpIELulSuTxGAeuCPl_A33X-KoPUpRmgK4dTphk"
 }

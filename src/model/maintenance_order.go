@@ -18,12 +18,12 @@ const (
 
 type MaintenanceOrder struct {
 	Id              int64       `gorm:"column:id"`
-	CommonUser      string      `gorm:"column:common_user"`
-	MaintenanceUser string      `gorm:"column:maintenance_user"`
+	CommonUser      string      `gorm:"column:common_user",json:"common_user"`
+	MaintenanceUser string      `gorm:"column:maintenance_user",json:"maintenance_user"`
 	Timestamp       int64       `gorm:"type:datetime",gorm:"column:time"`
-	Receiver        string      `gorm:"column:receiver"`
-	Reason          string      `gorm:"column:reason"`
-	Note            string      `gorm:"column:note"`
+	Receiver        string      `gorm:"column:receiver",json:"receiver"`
+	Reason          string      `gorm:"column:reason",json:"reason"`
+	Note            string      `gorm:"column:note",json:"note"`
 	Status          OrderStatus `gorm:"column:status"`
 	db              *gorm.DB
 }

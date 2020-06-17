@@ -7,6 +7,8 @@ type MaintenanceHistory struct {
 	MaintenanceUser string `gorm:"column:maintenance_user"`
 	CommonUser      string `gorm:"column:common_user"`
 	Timestamp       int64  `gorm:"type:datetime"`
+	Reason          string `gorm:"column:reason"`
+	Note            string `gorm:"column:note"`
 }
 
 func (MaintenanceHistory) TableName() string {
