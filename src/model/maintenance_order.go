@@ -41,7 +41,7 @@ func (order MaintenanceOrder) GetReceiver() (receivers []string) {
 
 func AddOrder(order MaintenanceOrder) (rs MaintenanceOrder, e error) {
 	rs = order
-	if dbc := Db.Create(&rs); dbc.Error != nil {
+	if e := Db.Create(&rs).Error; e != nil {
 		log.Println("[Database]", "add order", e.Error())
 	}
 
