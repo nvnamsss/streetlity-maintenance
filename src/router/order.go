@@ -1,63 +1,26 @@
 package router
 
 import (
-	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"streetlity-maintenance/maintenance"
 	"streetlity-maintenance/model"
+	"streetlity-maintenance/stages"
 
 	"github.com/gorilla/mux"
 	"github.com/nvnamsss/goinf/pipeline"
 )
 
-func requestOrder(w http.ResponseWriter, req *http.Request) {
+func RequestOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
 		Response
 		Order model.MaintenanceOrder
 	}
 	res.Status = true
 
-	req.ParseForm()
 	p := pipeline.NewPipeline()
-
-	vStage := pipeline.NewStage(func() (str struct {
-		CommonUser       string
-		MaintenanceUsers []string
-		Reason           string
-		Note             string
-	}, e error) {
-		form := req.PostForm
-		commonUsers, ok := form["commonUser"]
-
-		if !ok {
-			return str, errors.New("commonUser param is missing")
-		}
-
-		maintenanceUsers, ok := form["maintenanceUser"]
-
-		if !ok {
-			return str, errors.New("maintenanceUser param is missing")
-		}
-
-		reasons, ok := form["reason"]
-		if !ok {
-			return str, errors.New("reason param is missing")
-		}
-
-		notes, ok := form["note"]
-		if ok {
-			str.Note = notes[0]
-		}
-
-		str.CommonUser = commonUsers[0]
-		str.Reason = reasons[0]
-		str.MaintenanceUsers = maintenanceUsers
-
-		return
-	})
-	p.First = vStage
+	stage := stages.RequestOrderValidate(req)
+	p.First = stage
 	res.Error(p.Run())
 
 	if res.Status {
@@ -79,58 +42,18 @@ func requestOrder(w http.ResponseWriter, req *http.Request) {
 	WriteJson(w, res)
 }
 
-func acceptOrder(w http.ResponseWriter, req *http.Request) {
+func AcceptOrder(w http.ResponseWriter, req *http.Request) {
 	var res Response = Response{Status: true}
 
-	req.ParseForm()
 	p := pipeline.NewPipeline()
-	vStage := pipeline.NewStage(func() (str struct {
-		MaintenanceUser string
-		OrderId         int64
-		Timestamp       int64
-	}, e error) {
-		form := req.PostForm
-		_, ok := form["maintenanceUser"]
-		if !ok {
-			return str, errors.New("maintenanceUser param is missing")
-		}
-
-		timestamps, ok := form["timestamp"]
-		if !ok {
-			return str, errors.New("timestamp param is missing")
-		}
-
-		ids, ok := form["orderId"]
-		if !ok {
-			return str, errors.New("oderId param is missing")
-		}
-
-		id, e := strconv.ParseInt(ids[0], 10, 64)
-
-		if e != nil {
-			return str, errors.New("cannot parse orderId to int")
-		}
-
-		timestamp, e := strconv.ParseInt(timestamps[0], 10, 64)
-
-		if e != nil {
-			return str, errors.New("cannot parse timestamp to int")
-		}
-
-		str.MaintenanceUser = form["user"][0]
-		str.OrderId = id
-		str.Timestamp = timestamp
-
-		return
-	})
-
-	p.First = vStage
+	stage := stages.AcceptOrderValidate(req)
+	p.First = stage
 
 	res.Error(p.Run())
 
 	if res.Status {
-		maintenance_user := p.GetString("MaintenanceUser")[0]
-		order_id := p.GetInt("OrderId")[0]
+		maintenance_user := p.GetStringFirstOrDefault("MaintenanceUser")
+		order_id := p.GetIntFirstOrDefault("OrderId")
 		// timestamp := p.GetInt("Timestamp")[0]
 
 		maintenance.Accept(order_id, maintenance_user)
@@ -139,14 +62,51 @@ func acceptOrder(w http.ResponseWriter, req *http.Request) {
 	WriteJson(w, res)
 }
 
-func denyOrder(w http.ResponseWriter, req *http.Request) {
-	var res Response = Response{Status: true}
+func DenyOrder(w http.ResponseWriter, req *http.Request) {
+	var res struct {
+		Response
+		Order model.MaintenanceOrder
+	}
+
+	p := pipeline.NewPipeline()
+	stage := stages.DenyOrderValidate(req)
+	p.First = stage
+	res.Error(p.Run())
+
+	if res.Status {
+		order_id := p.GetIntFirstOrDefault("OrderId")
+		deny_type := p.GetIntFirstOrDefault("DenyType")
+		if order, e := maintenance.Deny(order_id, deny_type); e != nil {
+			res.Error(e)
+		} else {
+			res.Order = order
+		}
+	}
 
 	WriteJson(w, res)
 }
 
-func completeOrder(w http.ResponseWriter, req *http.Request) {
-	var res Response = Response{Status: true}
+func CompleteOrder(w http.ResponseWriter, req *http.Request) {
+	var res struct {
+		Response
+		Order model.MaintenanceOrder
+	}
+	res.Status = true
+
+	req.ParseForm()
+	p := pipeline.NewPipeline()
+	stage := stages.IdValidate(req.PostForm, "order_id")
+	p.First = stage
+	res.Error(p.Run())
+
+	if res.Status {
+		order_id := p.GetIntFirstOrDefault("Id")
+		if order, e := maintenance.Complete(order_id); e != nil {
+			res.Error(e)
+		} else {
+			res.Order = order
+		}
+	}
 
 	WriteJson(w, res)
 }
@@ -155,5 +115,8 @@ func HandleOrder(router *mux.Router) {
 	log.Println("[Router]", "Handle order")
 
 	s := router.PathPrefix("/order").Subrouter()
-	s.HandleFunc("/", requestOrder).Methods("POST")
+	s.HandleFunc("/request", RequestOrder).Methods("POST")
+	s.HandleFunc("/accept", AcceptOrder).Methods("POST")
+	s.HandleFunc("/deny", DenyOrder).Methods("POST")
+	s.HandleFunc("/complete", CompleteOrder).Methods("POST")
 }

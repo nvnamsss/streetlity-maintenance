@@ -8,8 +8,8 @@ import (
 )
 
 //Deny remove the order, notify to the receiver user if it was accepted
-func Deny() (order model.MaintenanceOrder, e error) {
-	order = model.MaintenanceOrder{}
+func Deny(order_id int64, deny_type int64) (order model.MaintenanceOrder, e error) {
+	order.Id = order_id
 	if order, e = model.FindOrder(order); e != nil {
 		return
 	}

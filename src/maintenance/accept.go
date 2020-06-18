@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"streetlity-maintenance/model"
 	"streetlity-maintenance/srpc"
+	"time"
 )
 
 //Accept the order
@@ -20,6 +21,7 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 		return
 	}
 
+	order.Timestamp = time.Now().Unix()
 	order.Status = model.Accepted
 	NotifyAccepted(order)
 	e = order.Save()
