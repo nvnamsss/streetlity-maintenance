@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"streetlity-maintenance/model"
 	"streetlity-maintenance/router"
+	"streetlity-maintenance/server"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -35,6 +36,8 @@ func main() {
 		IdleTimeout:  time.Second * 60,
 		Handler:      loggedRouter,
 	}
+
+	go server.Create()
 
 	go func() {
 		if err := Server.ListenAndServe(); err != nil {

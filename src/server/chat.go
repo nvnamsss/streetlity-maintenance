@@ -8,8 +8,37 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
-func CreateChatRoom(s socketio.Conn, msg string) string {
-	return "recv " + msg
+var server *socketio.Server
+
+//Open new namespace for common user and maintenance user. The create namespace include chat room and location room
+func OpenOrderSpace(nsp string) {
+	server.OnEvent(nsp, "location-update", func(s socketio.Conn, msg string) {
+		server.ForEach(nsp, "msg", func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("location-update", msg)
+			}
+		})
+	})
+
+	server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
+		s.Join("location")
+		s.Join("chat")
+	})
+
+	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string) {
+		s.SetContext(msg)
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("msg", msg)
+			}
+		})
+	})
+
+	server.OnDisconnect(nsp, func(s socketio.Conn, msg string) {
+		s.Leave("location")
+		s.Leave("msg")
+		s.Close()
+	})
 }
 
 func Create() {
@@ -30,25 +59,34 @@ func Create() {
 	})
 
 	server.OnEvent("/location", "update", func(s socketio.Conn, msg string) {
-
+		log.Println("[SocketIO]", "update location", msg)
+		// server.ForEach("/location", room, func(c socketio.Conn) {
+		// 	if c.ID() != s.ID() {
+		// 		c.Emit("")
+		// 	}
+		// })
 	})
 
 	server.OnEvent("/chat", "join", func(s socketio.Conn, msg string) string {
+		log.Println("[SocketIO]", "join chat", msg)
 		s.Join(msg)
 		return "join " + msg
 	})
 
 	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
+		log.Println("[SocketIO]", "message", msg)
 		s.SetContext(msg)
-		rooms := s.Rooms()
-		for _, room := range rooms {
-			server.ForEach("/chat", room, func(c socketio.Conn) {
-				if c.ID() != s.ID() {
-					c.Emit("msg", msg)
-				}
-			})
-			// server.BroadcastToRoom("/chat", room, "msg", msg)
-		}
+
+		// rooms := s.Rooms()
+		server.ForEach("/chat", "", func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("msg", msg)
+			}
+		})
+		// for _, room := range rooms {
+
+		// 	// server.BroadcastToRoom("/chat", room, "msg", msg)
+		// }
 
 		return "recv " + msg
 	})
@@ -71,6 +109,6 @@ func Create() {
 
 	http.Handle("/socket.io/", server)
 	http.Handle("/", http.FileServer(http.Dir("./asset")))
-	log.Println("Serving at localhost:8000...")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	log.Println("Serving at localhost:6182...")
+	log.Fatal(http.ListenAndServe(":6182", nil))
 }

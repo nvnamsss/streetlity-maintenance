@@ -11,11 +11,13 @@ type MaintenanceHistory struct {
 	Note            string `gorm:"column:note"`
 }
 
+const HistoryTableName = "maintenance_history"
+
 func (MaintenanceHistory) TableName() string {
-	return "maintenance_history"
+	return HistoryTableName
 }
 
-func AddMaintenanceHistory(h MaintenanceHistory) (e error) {
+func CreateMaintenanceHistory(h MaintenanceHistory) (e error) {
 	if e = Db.Create(&h).Error; e != nil {
 		log.Println("[Database]", "Adding new history:", e.Error())
 	}

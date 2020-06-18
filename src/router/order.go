@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"streetlity-maintenance/maintenance"
 	"streetlity-maintenance/model"
+	"streetlity-maintenance/sres"
 	"streetlity-maintenance/stages"
 
 	"github.com/gorilla/mux"
@@ -13,7 +14,7 @@ import (
 
 func RequestOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
-		Response
+		sres.Response
 		Order model.MaintenanceOrder
 	}
 	res.Status = true
@@ -25,25 +26,25 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 
 	if res.Status {
 		common_user := p.GetString("CommonUser")[0]
-		maintenance_user_ids := p.GetString("MaintenanceUsers")
+		maintenance_users := p.GetString("MaintenanceUsers")
 		reason := p.GetString("Reason")[0]
 
 		note := p.GetStringFirstOrDefault("Note")
 
-		if order, e := maintenance.Order(common_user, maintenance_user_ids, reason, note); e != nil {
+		if order, e := maintenance.Order(common_user, maintenance_users, reason, note); e != nil {
 			res.Error(e)
 		} else {
 			log.Println(order)
-			res.Order = order
+			res.Order = order.Order
 		}
 
 	}
 
-	WriteJson(w, res)
+	sres.WriteJson(w, res)
 }
 
 func AcceptOrder(w http.ResponseWriter, req *http.Request) {
-	var res Response = Response{Status: true}
+	var res sres.Response = sres.Response{Status: true}
 
 	p := pipeline.NewPipeline()
 	stage := stages.AcceptOrderValidate(req)
@@ -59,12 +60,12 @@ func AcceptOrder(w http.ResponseWriter, req *http.Request) {
 		maintenance.Accept(order_id, maintenance_user)
 	}
 
-	WriteJson(w, res)
+	sres.WriteJson(w, res)
 }
 
 func DenyOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
-		Response
+		sres.Response
 		Order model.MaintenanceOrder
 	}
 
@@ -83,12 +84,12 @@ func DenyOrder(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	WriteJson(w, res)
+	sres.WriteJson(w, res)
 }
 
 func CompleteOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
-		Response
+		sres.Response
 		Order model.MaintenanceOrder
 	}
 	res.Status = true
@@ -108,7 +109,7 @@ func CompleteOrder(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	WriteJson(w, res)
+	sres.WriteJson(w, res)
 }
 
 func HandleOrder(router *mux.Router) {

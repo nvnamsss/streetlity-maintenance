@@ -28,8 +28,24 @@ type MaintenanceOrder struct {
 	db              *gorm.DB
 }
 
+const OrderTableName = "maintenance_order"
+
 func (MaintenanceOrder) TableName() string {
-	return "maintenance_order"
+	return OrderTableName
+}
+
+func (order *MaintenanceOrder) SetReceiver(receivers ...string) {
+	len := len(receivers)
+	order.Receiver = ""
+	if len == 0 {
+		return
+	}
+
+	receiverString := receivers[0]
+	for loop := 1; loop < len; loop++ {
+		receiverString += ";" + receivers[loop]
+	}
+	order.Receiver = receiverString
 }
 
 func (order MaintenanceOrder) GetReceiver() (receivers []string) {
@@ -39,7 +55,7 @@ func (order MaintenanceOrder) GetReceiver() (receivers []string) {
 	return
 }
 
-func AddOrder(order MaintenanceOrder) (rs MaintenanceOrder, e error) {
+func CreateOrder(order MaintenanceOrder) (rs MaintenanceOrder, e error) {
 	rs = order
 	if e := Db.Create(&rs).Error; e != nil {
 		log.Println("[Database]", "add order", e.Error())
