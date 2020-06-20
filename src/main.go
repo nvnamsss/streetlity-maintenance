@@ -37,13 +37,12 @@ func main() {
 		Handler:      loggedRouter,
 	}
 
-	go server.Create()
-
 	go func() {
 		if err := Server.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
 	}()
+	go server.Create()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

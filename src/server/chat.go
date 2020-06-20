@@ -122,5 +122,4 @@ func Create() {
 	// server.Close()
 	// log.Println("Hi mom")
 	// log.Fatal()
-	log.Println("[Server]", server)
 }

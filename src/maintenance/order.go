@@ -37,8 +37,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 
 	str.RoomId = strconv.FormatInt(str.Order.Id, 10)
 
-	str.RoomId = "Himom"
-	log.Println("[Order]", str.Order)
+	log.Println("[Order]", str)
 	resp, e := srpc.RequestNotify(url.Values{
 		"id":            maintenance_users,
 		"notify-tittle": {"Customer is on service"},
