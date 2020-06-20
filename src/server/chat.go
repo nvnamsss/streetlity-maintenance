@@ -21,6 +21,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
+		log.Println("[Server]", "Join", msg)
 		s.Join("location")
 		s.Join("chat")
 	})
@@ -42,7 +43,8 @@ func OpenOrderSpace(nsp string) {
 }
 
 func Create() {
-	server, err := socketio.NewServer(nil)
+	var err error
+	server, err = socketio.NewServer(nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -105,10 +107,20 @@ func Create() {
 		fmt.Println("closed", reason)
 	})
 	go server.Serve()
-	defer server.Close()
 
 	http.Handle("/socket.io/", server)
 	http.Handle("/", http.FileServer(http.Dir("./asset")))
-	log.Println("Serving at localhost:6182...")
-	log.Fatal(http.ListenAndServe(":6182", nil))
+	go func() {
+		if e := http.ListenAndServe(":6182", nil); e != nil {
+			log.Println("[Server]", e.Error())
+		} else {
+			log.Println("Serving at localhost:6182...")
+
+		}
+
+	}()
+	// server.Close()
+	// log.Println("Hi mom")
+	// log.Fatal()
+	log.Println("[Server]", server)
 }
