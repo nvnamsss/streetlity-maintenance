@@ -1,6 +1,9 @@
 package model
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 type MaintenanceHistory struct {
 	Id              int64
@@ -18,6 +21,7 @@ func (MaintenanceHistory) TableName() string {
 }
 
 func CreateMaintenanceHistory(h MaintenanceHistory) (e error) {
+	h.Timestamp = time.Now().Unix()
 	if e = Db.Create(&h).Error; e != nil {
 		log.Println("[Database]", "Adding new history:", e.Error())
 	}

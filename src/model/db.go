@@ -46,3 +46,8 @@ func Connect() {
 	OnDisconnect.Subscribe(reconnect)
 	go connect()
 }
+
+func ConnectSync() {
+	OnDisconnect.Subscribe(reconnect)
+	connect()
+}
