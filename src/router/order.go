@@ -32,9 +32,11 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 		note := p.GetStringFirstOrDefault("Note")
 
 		if order, e := maintenance.Order(common_user, maintenance_users, reason, note); e != nil {
+			log.Println("[Order-Router]", e.Error())
+
 			res.Error(e)
 		} else {
-			log.Println(order)
+			log.Println("[Order-Router]", order)
 			res.Order = order.Order
 		}
 
@@ -77,7 +79,7 @@ func DenyOrder(w http.ResponseWriter, req *http.Request) {
 	if res.Status {
 		order_id := p.GetIntFirstOrDefault("OrderId")
 		deny_type := p.GetIntFirstOrDefault("DenyType")
-		if order, e := maintenance.Deny(order_id, deny_type); e != nil {
+		if order, e := maintenance.Decline(order_id, deny_type); e != nil {
 			res.Error(e)
 		} else {
 			res.Order = order

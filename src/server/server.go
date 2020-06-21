@@ -10,8 +10,11 @@ import (
 
 var server *socketio.Server
 
+const Tag string = "[Realtime-Server]"
+
 //Open new namespace for common user and maintenance user. The create namespace include chat room and location room
 func OpenOrderSpace(nsp string) {
+	log.Println(Tag, "Creating namespace", nsp)
 	server.OnEvent(nsp, "location-update", func(s socketio.Conn, msg string) {
 		server.ForEach(nsp, "msg", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
@@ -21,7 +24,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
-		log.Println("[Server]", "Join", msg)
+		log.Println(Tag, "Join", msg)
 		s.Join("location")
 		s.Join("chat")
 	})
@@ -66,7 +69,7 @@ func OpenOrderSpaceByRoom(room string) {
 	})
 
 	server.OnEvent("order", "join", func(s socketio.Conn, msg string) {
-		log.Println("[Server]", "Join", msg)
+		log.Println(Tag, "Join room", room)
 		s.Join(room)
 	})
 

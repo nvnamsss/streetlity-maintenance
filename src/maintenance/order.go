@@ -18,6 +18,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 	Order  model.MaintenanceOrder
 	RoomId string
 }, e error) {
+	log.Println("[Router]", "len", len(maintenance_users))
 	if len(maintenance_users) == 0 {
 		return str, errors.New("there are no maintenance user that receives the order")
 	}
@@ -25,6 +26,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 	str.Order.Reason = reason
 	str.Order.Note = note
 	str.Order.SetReceiver(maintenance_users...)
+	log.Println("[Router]", "len", len(maintenance_users))
 
 	if str.Order, e = model.CreateOrder(str.Order); e != nil {
 		return
@@ -38,6 +40,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 	str.RoomId = strconv.FormatInt(str.Order.Id, 10)
 
 	log.Println("[Order]", str)
+	log.Println("[Order]", "maintenance users", maintenance_users)
 	resp, e := srpc.RequestNotify(url.Values{
 		"id":            maintenance_users,
 		"notify-tittle": {"Customer is on service"},
