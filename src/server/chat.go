@@ -35,10 +35,53 @@ func OpenOrderSpace(nsp string) {
 		})
 	})
 
+	server.OnEvent(nsp, "decline", func(s socketio.Conn, msg string) {
+		server.ClearRoom(nsp, "join")
+		server.ClearRoom(nsp, "chat")
+		server.ClearRoom(nsp, "decline")
+	})
+
 	server.OnDisconnect(nsp, func(s socketio.Conn, msg string) {
 		s.Leave("location")
 		s.Leave("msg")
 		s.Close()
+	})
+}
+
+func OpenOrderSpaceByRoom(room string) {
+	server.OnEvent("order", "update-location", func(s socketio.Conn, msg string) {
+		server.ForEach("location", room, func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("update-location", msg)
+			}
+		})
+	})
+
+	server.OnEvent("order", "information", func(s socketio.Conn, msg string) {
+		server.ForEach("order", room, func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("information", msg)
+			}
+		})
+	})
+
+	server.OnEvent("order", "join", func(s socketio.Conn, msg string) {
+		log.Println("[Server]", "Join", msg)
+		s.Join(room)
+	})
+
+	server.OnEvent("order", "chat", func(s socketio.Conn, msg string) {
+		s.SetContext(msg)
+		server.ForEach("order", room, func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("chat", msg)
+			}
+		})
+	})
+
+	server.OnEvent("order", "decline", func(s socketio.Conn, msg string) {
+		server.ClearRoom("order", room)
+		server.BroadcastToRoom("order", room, "decline")
 	})
 }
 
