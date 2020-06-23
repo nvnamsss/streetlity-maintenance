@@ -10,7 +10,7 @@ echo "DONE STOPPING"
 docker run --name ${name}_maintenance_container -d\
             --network common-net \
             --restart always \
-            -p 9000:9000 \
+            -p 9002:9002 \
             maintenance_container
 
 docker cp config.json ${name}_maintenance_container:/server/config/config.json    
