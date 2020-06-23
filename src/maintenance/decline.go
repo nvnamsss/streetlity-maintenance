@@ -30,5 +30,6 @@ func NotifyDecline(order model.MaintenanceOrder) {
 		"notify-tittle": {"An order is declined"},
 		"notify-body":   {"An order is declined"},
 		"data":          {data_id, data_action, data_message},
+		"click-action":  {""},
 	})
 }

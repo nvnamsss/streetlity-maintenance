@@ -21,6 +21,7 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 		return
 	}
 
+	order.Receiver = maintenance_user
 	order.Timestamp = time.Now().Unix()
 	order.Status = model.Accepted
 	NotifyAccepted(order)
@@ -33,12 +34,13 @@ func NotifyAccepted(order model.MaintenanceOrder) {
 	receivers := order.GetReceiver()
 	data_id := "id:" + strconv.FormatInt(order.Id, 10)
 	data_action := "action:" + "Accepted"
-	data_message := "message:" + "An order is accepted by other"
+	data_receiver := "receiver:" + order.Receiver
 
 	srpc.RequestNotify(url.Values{
 		"id":            receivers,
-		"notify-tittle": {""},
-		"notify-body":   {""},
-		"data":          {data_id, data_action, data_message},
+		"notify-tittle": {"We got a dream"},
+		"notify-body":   {"A dream is became true"},
+		"data":          {data_id, data_action, data_receiver},
+		"click-action":  {"MaintenanceAcceptNotification"},
 	})
 }

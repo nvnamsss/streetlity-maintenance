@@ -15,6 +15,7 @@ func RequestOrderValidate(req *http.Request) *pipeline.Stage {
 		CommonUser       string
 		MaintenanceUsers []string
 		Reason           string
+		Phone            string
 		Note             string
 	}, e error) {
 		form := req.PostForm
@@ -35,6 +36,11 @@ func RequestOrderValidate(req *http.Request) *pipeline.Stage {
 			return str, errors.New("reason param is missing")
 		}
 
+		phones, ok := form["phone"]
+		if !ok {
+			return str, errors.New("phone param is missing")
+		}
+
 		notes, ok := form["note"]
 		if ok {
 			str.Note = notes[0]
@@ -43,6 +49,7 @@ func RequestOrderValidate(req *http.Request) *pipeline.Stage {
 		str.CommonUser = commonUsers[0]
 		str.Reason = reasons[0]
 		str.MaintenanceUsers = maintenanceUsers
+		str.Phone = phones[0]
 
 		return
 	})

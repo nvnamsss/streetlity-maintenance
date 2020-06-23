@@ -28,10 +28,10 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 		common_user := p.GetString("CommonUser")[0]
 		maintenance_users := p.GetString("MaintenanceUsers")
 		reason := p.GetString("Reason")[0]
-
+		phone := p.GetString("Phone")[0]
 		note := p.GetStringFirstOrDefault("Note")
 
-		if order, e := maintenance.Order(common_user, maintenance_users, reason, note); e != nil {
+		if order, e := maintenance.Request(common_user, maintenance_users, reason, phone, note); e != nil {
 			log.Println("[Order-Router]", e.Error())
 
 			res.Error(e)

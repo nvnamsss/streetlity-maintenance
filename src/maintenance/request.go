@@ -13,7 +13,7 @@ import (
 	"streetlity-maintenance/srpc"
 )
 
-func Order(common_user string, maintenance_users []string, reason string, note string) (str struct {
+func Request(common_user string, maintenance_users []string, reason string, phone string, note string) (str struct {
 	sres.Response
 	Order  model.MaintenanceOrder
 	RoomId string
@@ -46,6 +46,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 		"notify-tittle": {"Customer is on service"},
 		"notify-body":   {"A customer is looking for maintaining"},
 		"data":          {data_id, data_user, data_reason, data_note},
+		"click-action":  {"MaintenanceOrderNotification"},
 	})
 
 	if e != nil {
@@ -56,7 +57,7 @@ func Order(common_user string, maintenance_users []string, reason string, note s
 	}
 	defer resp.Body.Close()
 
-	server.OpenOrderSpace(str.RoomId)
+	server.OpenOrderSpaceByRoom(str.RoomId)
 	var res struct {
 		Status  bool   `json:"Status"`
 		Message string `json:"Message"`

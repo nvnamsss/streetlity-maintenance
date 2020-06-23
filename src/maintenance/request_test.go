@@ -61,7 +61,8 @@ func TestOrder(t *testing.T) {
 	receiver := []string{"god", "play"}
 	reason := ""
 	note := ""
-	order, e := maintenance.Order(cUser, receiver, reason, note)
+	phone := ""
+	order, e := maintenance.Order(cUser, receiver, reason, phone, note)
 
 	if e != nil {
 		log.Println(e.Error())
