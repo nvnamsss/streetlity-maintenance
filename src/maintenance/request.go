@@ -57,7 +57,7 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	}
 	defer resp.Body.Close()
 
-	server.OpenOrderSpaceByRoom(str.RoomId)
+	server.OpenOrderSpace("/" + str.RoomId)
 	var res struct {
 		Status  bool   `json:"Status"`
 		Message string `json:"Message"`

@@ -32,10 +32,10 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 		note := p.GetStringFirstOrDefault("Note")
 
 		if order, e := maintenance.Request(common_user, maintenance_users, reason, phone, note); e != nil {
-			log.Println("[Order-Router]", e.Error())
+			log.Println("[Order-Router]", "Request failed", e.Error())
 			res.Error(e)
 		} else {
-			log.Println("[Order-Router]", order)
+			log.Println("[Order-Router]", "Request success", order)
 			res.Order = order.Order
 		}
 
