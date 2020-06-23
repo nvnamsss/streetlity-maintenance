@@ -62,7 +62,7 @@ func TestOrder(t *testing.T) {
 	reason := ""
 	note := ""
 	phone := ""
-	order, e := maintenance.Order(cUser, receiver, reason, phone, note)
+	order, e := maintenance.Request(cUser, receiver, reason, phone, note)
 
 	if e != nil {
 		log.Println(e.Error())

@@ -33,7 +33,6 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 
 		if order, e := maintenance.Request(common_user, maintenance_users, reason, phone, note); e != nil {
 			log.Println("[Order-Router]", e.Error())
-
 			res.Error(e)
 		} else {
 			log.Println("[Order-Router]", order)

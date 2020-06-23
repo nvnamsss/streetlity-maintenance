@@ -29,15 +29,15 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 	return
 }
 
-//NotifyAccepted send a notify to other maintenance users that the order is accepted by other
+//NotifyAccepted send a notify back to common user to confirm that the order is accepted by some one
 func NotifyAccepted(order model.MaintenanceOrder) {
-	receivers := order.GetReceiver()
+	receiver := order.CommonUser
 	data_id := "id:" + strconv.FormatInt(order.Id, 10)
 	data_action := "action:" + "Accepted"
 	data_receiver := "receiver:" + order.Receiver
 
 	srpc.RequestNotify(url.Values{
-		"id":            receivers,
+		"id":            {receiver},
 		"notify-tittle": {"We got a dream"},
 		"notify-body":   {"A dream is became true"},
 		"data":          {data_id, data_action, data_receiver},
