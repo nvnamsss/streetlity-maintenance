@@ -21,6 +21,7 @@ func OpenOrderSpace(nsp string) {
 		s.Join("location")
 		s.Join("chat")
 		s.Join("information")
+
 		return
 	})
 
@@ -31,15 +32,15 @@ func OpenOrderSpace(nsp string) {
 		s.Join("information")
 	})
 
-	server.OnEvent(nsp, "update-location", func(s socketio.Conn, msg string) {
+	server.OnEvent(nsp, "update-location", func(s socketio.Conn, data string) {
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
-				c.Emit("location-update", msg)
+				c.Emit("location-update", data)
 			}
 		})
 	})
 
-	server.OnEvent(nsp, "pull-location", func(s socketio.Conn, msg string) {
+	server.OnEvent(nsp, "pull-location", func(s socketio.Conn) {
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("pull-location")
@@ -47,44 +48,53 @@ func OpenOrderSpace(nsp string) {
 		})
 	})
 
-	server.OnEvent(nsp, "update-information", func(s socketio.Conn, msg string) {
+	server.OnEvent(nsp, "update-information", func(s socketio.Conn, data string) {
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
-				c.Emit("update-information", msg)
+				c.Emit("update-information", data)
 			}
 		})
 	})
 
-	server.OnEvent(nsp, "pull-information", func(s socketio.Conn, msg string) {
+	server.OnEvent(nsp, "pull-information", func(s socketio.Conn) {
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
-				c.Emit("pull-information", msg)
+				c.Emit("pull-information")
 			}
 		})
 	})
 
-	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string) {
+	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string, timestamp string) {
 		s.SetContext(msg)
-		log.Println(Tag, "chat", msg)
+		log.Println(Tag, "chat", msg, timestamp)
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
-				c.Emit("chat", msg)
+				c.Emit("chat", msg, timestamp)
 			}
 		})
 	})
 
-	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, msg string) {
-
+	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, typing_user string) {
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("typing-chat", typing_user)
+			}
+		})
 	})
 
-	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, msg string) {
-
+	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, typed_user string) {
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
+			if c.ID() != s.ID() {
+				c.Emit("typed-chat", typed_user)
+			}
+		})
 	})
 
 	server.OnEvent(nsp, "decline", func(s socketio.Conn, msg string) {
 		server.ClearRoom(nsp, "join")
 		server.ClearRoom(nsp, "chat")
 		server.ClearRoom(nsp, "information")
+		s.Close()
 	})
 
 	server.OnDisconnect(nsp, func(s socketio.Conn, msg string) {
@@ -155,67 +165,15 @@ func Create() {
 		log.Fatal(err)
 	}
 
-	server.OnConnect("/", func(s socketio.Conn) error {
-		s.SetContext("")
-		fmt.Println("connected:", s.ID())
-		return nil
-	})
-
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
-	})
-
-	server.OnEvent("/location", "update", func(s socketio.Conn, msg string) {
-		log.Println("[SocketIO]", "update location", msg)
-		// server.ForEach("/location", room, func(c socketio.Conn) {
-		// 	if c.ID() != s.ID() {
-		// 		c.Emit("")
-		// 	}
-		// })
-	})
-
-	server.OnEvent("/chat", "join", func(s socketio.Conn, msg string) string {
-		log.Println("[SocketIO]", "join chat", msg)
-		s.Join(msg)
-		return "join " + msg
-	})
-
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-		log.Println("[SocketIO]", "message", msg)
-		s.SetContext(msg)
-
-		// rooms := s.Rooms()
-		server.ForEach("/chat", "", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
-				c.Emit("msg", msg)
-			}
-		})
-		// for _, room := range rooms {
-
-		// 	// server.BroadcastToRoom("/chat", room, "msg", msg)
-		// }
-
-		return "recv " + msg
-	})
-
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
-		last := s.Context().(string)
-		s.Emit("bye", last)
-		s.Close()
-		return last
-	})
-
 	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e)
+		fmt.Println("meet error:", e.Error())
 	})
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		fmt.Println("closed", reason)
-	})
+
 	go server.Serve()
 
 	http.Handle("/socket.io/", server)
 	http.Handle("/", http.FileServer(http.Dir("./asset")))
+
 	go func() {
 		if e := http.ListenAndServe(":6182", nil); e != nil {
 			log.Println("[Server]", e.Error())
