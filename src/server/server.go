@@ -17,7 +17,7 @@ func OpenOrderSpace(nsp string) {
 	log.Println(Tag, "Creating namespace", nsp)
 
 	server.OnConnect(nsp, func(s socketio.Conn) (e error) {
-		log.Println(Tag, "nsp:", "new connection:", s.ID())
+		log.Println(Tag, nsp+"-", "new connection:", s.ID())
 		s.Join("location")
 		s.Join("chat")
 		s.Join("information")
