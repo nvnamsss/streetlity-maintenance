@@ -110,6 +110,15 @@ func OpenOrderSpace(nsp string) {
 		s.Leave("information")
 		s.Close()
 	})
+
+	rooms := server.Rooms(nsp)
+
+	for _, room := range rooms {
+		server.ForEach(nsp, room, func(s socketio.Conn) {
+			log.Println(Tag, "Some one still here, bye bitch")
+			s.Close()
+		})
+	}
 }
 
 func OpenOrderSpaceByRoom(room string) {
