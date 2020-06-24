@@ -17,7 +17,7 @@ func OpenOrderSpace(nsp string) {
 	log.Println(Tag, "Creating namespace", nsp)
 
 	server.OnConnect(nsp, func(s socketio.Conn) (e error) {
-		log.Println(Tag, nsp+"-", "new connection:", s.ID())
+		log.Println(Tag, nsp, "new connection:", s.ID())
 		s.Join("location")
 		s.Join("chat")
 		s.Join("information")
@@ -33,6 +33,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "update-location", func(s socketio.Conn, data string) {
+		log.Println(Tag, "pull-location", data)
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("location-update", data)
@@ -41,6 +42,8 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "pull-location", func(s socketio.Conn) {
+		log.Println(Tag, "pull-location")
+
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("pull-location")
@@ -49,6 +52,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "update-information", func(s socketio.Conn, data string) {
+		log.Println(Tag, "update-information", data)
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("update-information", data)
@@ -56,16 +60,17 @@ func OpenOrderSpace(nsp string) {
 		})
 	})
 
-	server.OnEvent(nsp, "pull-information", func(s socketio.Conn) {
+	server.OnEvent(nsp, "pull-information", func(s socketio.Conn, msg string) {
+		log.Println(Tag, "pull-information", msg)
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
-				c.Emit("pull-information")
+				c.Emit("pull-information", msg)
 			}
 		})
 	})
 
 	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string, timestamp string) {
-		s.SetContext(msg)
+		// s.SetContext(msg)
 		log.Println(Tag, "chat", msg, timestamp)
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
@@ -75,6 +80,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, typing_user string) {
+		log.Println(Tag, "typing-chat", "from", typing_user)
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("typing-chat", typing_user)
@@ -83,6 +89,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, typed_user string) {
+		log.Println(Tag, "typed-chat", "from", typed_user)
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("typed-chat", typed_user)
