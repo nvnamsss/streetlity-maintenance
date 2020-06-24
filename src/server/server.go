@@ -15,6 +15,15 @@ const Tag string = "[Realtime-Server]"
 //Open new namespace for common user and maintenance user. The create namespace include chat room and location room
 func OpenOrderSpace(nsp string) {
 	log.Println(Tag, "Creating namespace", nsp)
+
+	server.OnConnect(nsp, func(s socketio.Conn) (e error) {
+		log.Println(Tag, "nsp:", "new connection:", s.ID())
+		s.Join("location")
+		s.Join("chat")
+		s.Join("information")
+		return
+	})
+
 	server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
 		log.Println(Tag, "Join", msg)
 		s.Join("location")
@@ -62,6 +71,14 @@ func OpenOrderSpace(nsp string) {
 				c.Emit("chat", msg)
 			}
 		})
+	})
+
+	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, msg string) {
+
+	})
+
+	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, msg string) {
+
 	})
 
 	server.OnEvent(nsp, "decline", func(s socketio.Conn, msg string) {
