@@ -22,6 +22,7 @@ func OpenOrderSpace(nsp string) {
 		s.Join("chat")
 		s.Join("information")
 
+		s.Emit("joined")
 		return
 	})
 
@@ -33,7 +34,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "update-location", func(s socketio.Conn, data string) {
-		log.Println(Tag, "pull-location", data)
+		log.Println(Tag, "update-location", data)
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("location-update", data)
@@ -178,11 +179,11 @@ func Create() {
 	var err error
 	server, err = socketio.NewServer(nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(Tag, err)
 	}
 
 	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println("meet error:", e.Error())
+		fmt.Println(Tag, "meet error:", e.Error())
 	})
 
 	go server.Serve()
@@ -192,9 +193,9 @@ func Create() {
 
 	go func() {
 		if e := http.ListenAndServe(":6182", nil); e != nil {
-			log.Println("[Server]", e.Error())
+			log.Println(Tag, e.Error())
 		} else {
-			log.Println("Serving at localhost:6182...")
+			log.Println(Tag, "Serving at localhost:6182...")
 
 		}
 
