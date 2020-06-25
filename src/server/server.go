@@ -20,7 +20,6 @@ func OpenOrderSpace(nsp string) {
 		s.Join("location")
 		s.Join("chat")
 		s.Join("information")
-
 		s.Emit("joined")
 		return
 	})
@@ -72,6 +71,7 @@ func OpenOrderSpace(nsp string) {
 	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string, timestamp string) {
 		// s.SetContext(msg)
 		log.Println(Tag, "chat", msg, timestamp)
+		log.Println(Tag, "send message to ", server.RoomLen(nsp, "chat"))
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.ID() != s.ID() {
 				c.Emit("chat", msg, timestamp)
