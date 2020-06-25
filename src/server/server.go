@@ -27,6 +27,8 @@ func OpenOrderSpace(nsp string) {
 		stack := chat_stack[nsp]
 		for _, msg := range stack {
 			s.Emit("chat", msg)
+			log.Println(Tag, "Send chant stack to use", msg)
+
 		}
 		return
 	})
