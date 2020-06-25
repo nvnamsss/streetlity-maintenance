@@ -8,12 +8,14 @@ import (
 )
 
 var server *socketio.Server
+var chat_stack map[string][]string
 
 const Tag string = "[Realtime-Server]"
 
 //Open new namespace for common user and maintenance user. The create namespace include chat room and location room
 func OpenOrderSpace(nsp string) {
 	log.Println(Tag, "Creating namespace", nsp)
+	chat_stack[nsp] = []string{}
 
 	server.OnConnect(nsp, func(s socketio.Conn) (e error) {
 		log.Println(Tag, nsp, "new connection:", s.RemoteAddr().String())
@@ -21,6 +23,11 @@ func OpenOrderSpace(nsp string) {
 		s.Join("chat")
 		s.Join("information")
 		s.Emit("joined")
+
+		stack := chat_stack[nsp]
+		for _, msg := range stack {
+			s.Emit("chat", msg)
+		}
 		return
 	})
 
@@ -74,15 +81,15 @@ func OpenOrderSpace(nsp string) {
 		})
 	})
 
-	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string, timestamp string) {
+	server.OnEvent(nsp, "chat", func(s socketio.Conn, msg string) {
 		// s.SetContext(msg)
-		log.Println(Tag, "chat", msg, timestamp)
+		log.Println(Tag, "chat", msg)
 		log.Println(Tag, "send message to ", server.RoomLen(nsp, "chat"))
+		chat_stack[nsp] = append(chat_stack[nsp], msg)
 		address := s.RemoteAddr()
-
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.RemoteAddr() != address {
-				c.Emit("chat", msg, timestamp)
+				c.Emit("chat", msg)
 			}
 		})
 	})
