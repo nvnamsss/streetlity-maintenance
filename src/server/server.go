@@ -97,6 +97,8 @@ func OpenOrderSpace(nsp string) {
 			s.Emit("chat", msg)
 			time.Sleep(50 * time.Millisecond)
 		}
+
+		s.Emit("pulled-chat")
 	})
 
 	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, typing_user string) {
