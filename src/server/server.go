@@ -120,7 +120,11 @@ func OpenOrderSpace(nsp string) {
 		server.ClearRoom(nsp, "join")
 		server.ClearRoom(nsp, "chat")
 		server.ClearRoom(nsp, "information")
-		s.Close()
+		delete(chat_stack, nsp)
+
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
+			c.Close()
+		})
 	})
 
 	server.OnDisconnect(nsp, func(s socketio.Conn, msg string) {
@@ -197,6 +201,7 @@ func OpenOrderSpaceByRoom(room string) {
 func Create() {
 	var err error
 	server, err = socketio.NewServer(nil)
+	chat_stack = make(map[string][]string)
 	if err != nil {
 		log.Fatal(Tag, err)
 	}
