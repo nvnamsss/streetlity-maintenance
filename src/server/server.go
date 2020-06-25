@@ -33,8 +33,10 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "update-location", func(s socketio.Conn, data string) {
 		log.Println(Tag, "update-location", data)
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("location-update", data)
 			}
 		})
@@ -42,9 +44,9 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "pull-location", func(s socketio.Conn) {
 		log.Println(Tag, "pull-location")
-
+		address := s.RemoteAddr()
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("pull-location")
 			}
 		})
@@ -52,8 +54,10 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "update-information", func(s socketio.Conn, data string) {
 		log.Println(Tag, "update-information", data)
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("update-information", data)
 			}
 		})
@@ -61,8 +65,10 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "pull-information", func(s socketio.Conn, msg string) {
 		log.Println(Tag, "pull-information", msg)
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "information", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("pull-information", msg)
 			}
 		})
@@ -72,8 +78,10 @@ func OpenOrderSpace(nsp string) {
 		// s.SetContext(msg)
 		log.Println(Tag, "chat", msg, timestamp)
 		log.Println(Tag, "send message to ", server.RoomLen(nsp, "chat"))
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("chat", msg, timestamp)
 			}
 		})
@@ -81,8 +89,10 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, typing_user string) {
 		log.Println(Tag, "typing-chat", "from", typing_user)
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("typing-chat", typing_user)
 			}
 		})
@@ -90,8 +100,10 @@ func OpenOrderSpace(nsp string) {
 
 	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, typed_user string) {
 		log.Println(Tag, "typed-chat", "from", typed_user)
+		address := s.RemoteAddr()
+
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
-			if c.ID() != s.ID() {
+			if c.RemoteAddr() != address {
 				c.Emit("typed-chat", typed_user)
 			}
 		})
@@ -105,6 +117,7 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnDisconnect(nsp, func(s socketio.Conn, msg string) {
+		log.Println(Tag, nsp, "connection is closed:", s.RemoteAddr().String())
 		s.Leave("location")
 		s.Leave("chat")
 		s.Leave("information")
