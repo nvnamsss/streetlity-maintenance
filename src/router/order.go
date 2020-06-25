@@ -78,7 +78,7 @@ func DenyOrder(w http.ResponseWriter, req *http.Request) {
 	if res.Status {
 		order_id := p.GetIntFirstOrDefault("OrderId")
 		deny_type := p.GetIntFirstOrDefault("DenyType")
-		if order, e := maintenance.Decline(order_id, deny_type); e != nil {
+		if order, e := maintenance.Deny(order_id, deny_type); e != nil {
 			res.Error(e)
 		} else {
 			res.Order = order
