@@ -61,6 +61,7 @@ func CreateOrder(order MaintenanceOrder) (rs MaintenanceOrder, e error) {
 		log.Println("[Database]", "add order", e.Error())
 	}
 
+	rs.db = Db
 	return
 }
 
