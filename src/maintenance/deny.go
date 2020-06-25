@@ -18,8 +18,8 @@ func Deny(order_id int64, decline_type int64) (order model.MaintenanceOrder, e e
 	return
 }
 
-//NotifyDecline send a notify to other maintenance users that the order is denied
-func NotifyDecline(order model.MaintenanceOrder) {
+//NotifyDeny send a notify to other maintenance users that the order is denied
+func NotifyDeny(order model.MaintenanceOrder) {
 	receivers := []string{order.CommonUser}
 	data_id := "id:" + strconv.FormatInt(order.Id, 10)
 	data_action := "action:" + "Denied"

@@ -22,7 +22,7 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 		return
 	}
 
-	order.Receiver = maintenance_user
+	order.MaintenanceUser = maintenance_user
 	order.Timestamp = time.Now().Unix()
 	order.Status = model.Accepted
 	NotifyAccepted(order)
