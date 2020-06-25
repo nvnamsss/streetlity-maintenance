@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"time"
 
 	socketio "github.com/googollee/go-socket.io"
 )
@@ -24,12 +25,6 @@ func OpenOrderSpace(nsp string) {
 		s.Join("information")
 		s.Emit("joined")
 
-		stack := chat_stack[nsp]
-		for _, msg := range stack {
-			s.Emit("chat", msg)
-			log.Println(Tag, "Send chant stack to use", msg)
-
-		}
 		return
 	})
 
@@ -94,6 +89,14 @@ func OpenOrderSpace(nsp string) {
 				c.Emit("chat", msg)
 			}
 		})
+	})
+
+	server.OnEvent(nsp, "pull-chat", func(s socketio.Conn) {
+		stack := chat_stack[nsp]
+		for _, msg := range stack {
+			s.Emit("chat", msg)
+			time.Sleep(50 * time.Millisecond)
+		}
 	})
 
 	server.OnEvent(nsp, "typing-chat", func(s socketio.Conn, typing_user string) {
