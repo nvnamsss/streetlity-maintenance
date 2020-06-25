@@ -25,6 +25,7 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	str.Order.CommonUser = common_user
 	str.Order.Reason = reason
 	str.Order.Note = note
+	str.Order.Status = model.Waiting
 	str.Order.SetReceiver(maintenance_users...)
 	log.Println("[Router]", "len", len(maintenance_users))
 
@@ -33,7 +34,7 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	}
 
 	data_id := "id:" + strconv.FormatInt(str.Order.Id, 10)
-	data_user := "user:" + common_user
+	data_common_user := "common_user:" + common_user
 	data_reason := "reason:" + reason
 	data_note := "note:" + note
 
@@ -45,7 +46,7 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 		"id":            maintenance_users,
 		"notify-tittle": {"Customer is on service"},
 		"notify-body":   {"A customer is looking for maintaining"},
-		"data":          {data_id, data_user, data_reason, data_note},
+		"data":          {data_id, data_common_user, data_reason, data_note},
 		"click-action":  {"MaintenanceOrderNotification"},
 	})
 
