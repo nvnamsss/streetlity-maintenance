@@ -34,14 +34,14 @@ func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrd
 func NotifyAccepted(order model.MaintenanceOrder) {
 	data_id := "id:" + strconv.FormatInt(order.Id, 10)
 	data_action := "action:" + "Accepted"
-	data_receiver := "receiver:" + order.Receiver
+	data_maintenance_user := "maintenance_user:" + order.MaintenanceUser
 
 	log.Println("[Order]", "Send notify to", order.CommonUser)
 	srpc.RequestNotify(url.Values{
 		"id":            {order.CommonUser},
 		"notify-tittle": {"We got a dream"},
 		"notify-body":   {"A dream is became true"},
-		"data":          {data_id, data_action, data_receiver},
+		"data":          {data_id, data_action, data_maintenance_user},
 		"click-action":  {"MaintenanceAcceptNotification"},
 	})
 }
