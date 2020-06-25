@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -26,12 +25,12 @@ func OpenOrderSpace(nsp string) {
 		return
 	})
 
-	server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
-		log.Println(Tag, "Join", msg)
-		s.Join("location")
-		s.Join("chat")
-		s.Join("information")
-	})
+	// server.OnEvent(nsp, "join", func(s socketio.Conn, msg string) {
+	// 	log.Println(Tag, "Join", msg)
+	// 	s.Join("location")
+	// 	s.Join("chat")
+	// 	s.Join("information")
+	// })
 
 	server.OnEvent(nsp, "update-location", func(s socketio.Conn, data string) {
 		log.Println(Tag, "update-location", data)
@@ -183,7 +182,7 @@ func Create() {
 	}
 
 	server.OnError("/", func(s socketio.Conn, e error) {
-		fmt.Println(Tag, "meet error:", e.Error())
+		log.Println(Tag, "meet error:", e.Error())
 	})
 
 	go server.Serve()
