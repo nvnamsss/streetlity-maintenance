@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"streetlity-maintenance/model"
+	"streetlity-maintenance/model/order"
 	"strings"
 	"testing"
 )
@@ -17,7 +17,7 @@ func TestOrder(t *testing.T) {
 	client := &http.Client{}
 
 	var orders struct {
-		orders []model.MaintenanceOrder `json:"orders"`
+		orders []order.MaintenanceOrder `json:"orders"`
 	}
 
 	file, fileErr := os.Open("./order_test.json")

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"streetlity-maintenance/maintenance"
-	"streetlity-maintenance/model"
+	"streetlity-maintenance/model/order"
 	"streetlity-maintenance/sres"
 	"streetlity-maintenance/stages"
 
@@ -15,7 +15,7 @@ import (
 func RequestOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
 		sres.Response
-		Order model.MaintenanceOrder
+		Order order.MaintenanceOrder
 	}
 	res.Status = true
 
@@ -30,8 +30,9 @@ func RequestOrder(w http.ResponseWriter, req *http.Request) {
 		reason := p.GetString("Reason")[0]
 		phone := p.GetString("Phone")[0]
 		note := p.GetStringFirstOrDefault("Note")
+		order_type := int(p.GetInt("Type")[0])
 
-		if order, e := maintenance.Request(common_user, maintenance_users, reason, phone, note); e != nil {
+		if order, e := maintenance.Request(common_user, maintenance_users, reason, phone, note, order_type); e != nil {
 			log.Println("[Order-Router]", "Request failed", e.Error())
 			res.Error(e)
 		} else {
@@ -67,7 +68,7 @@ func AcceptOrder(w http.ResponseWriter, req *http.Request) {
 func DenyOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
 		sres.Response
-		Order model.MaintenanceOrder
+		Order order.MaintenanceOrder
 	}
 
 	p := pipeline.NewPipeline()
@@ -91,7 +92,7 @@ func DenyOrder(w http.ResponseWriter, req *http.Request) {
 func CompleteOrder(w http.ResponseWriter, req *http.Request) {
 	var res struct {
 		sres.Response
-		Order model.MaintenanceOrder
+		Order order.MaintenanceOrder
 	}
 	res.Status = true
 
