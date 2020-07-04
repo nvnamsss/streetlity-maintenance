@@ -1,15 +1,15 @@
 package maintenance
 
-import "streetlity-maintenance/model"
+import "streetlity-maintenance/model/order"
 
 //Complete mark the request as completed
-func Complete(order_id int64) (order model.MaintenanceOrder, e error) {
-	order.Id = order_id
-	if order, e = model.FindOrder(order); e != nil {
+func Complete(order_id int64) (o order.MaintenanceOrder, e error) {
+	o.Id = order_id
+	if o, e = order.FindOrder(o); e != nil {
 		return
 	}
 
-	order.Status = model.Completed
-	e = order.Save()
+	o.Status = order.Completed
+	e = o.Save()
 	return
 }

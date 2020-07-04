@@ -7,15 +7,15 @@ import (
 	"log"
 	"net/url"
 	"strconv"
-	"streetlity-maintenance/model"
+	"streetlity-maintenance/model/order"
 	"streetlity-maintenance/server"
 	"streetlity-maintenance/sres"
 	"streetlity-maintenance/srpc"
 )
 
-func Request(common_user string, maintenance_users []string, reason string, phone string, note string) (str struct {
+func Request(common_user string, maintenance_users []string, reason string, phone string, note string, order_type int) (str struct {
 	sres.Response
-	Order  model.MaintenanceOrder
+	Order  order.MaintenanceOrder
 	RoomId string
 }, e error) {
 	log.Println("[Router]", "len", len(maintenance_users))
@@ -25,11 +25,12 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	str.Order.CommonUser = common_user
 	str.Order.Reason = reason
 	str.Order.Note = note
-	str.Order.Status = model.Waiting
+	str.Order.Status = order.Waiting
+	str.Order.Type = order_type
 	str.Order.SetReceiver(maintenance_users...)
 	log.Println("[Router]", "len", len(maintenance_users))
 
-	if str.Order, e = model.CreateOrder(str.Order); e != nil {
+	if str.Order, e = order.CreateOrder(str.Order); e != nil {
 		return
 	}
 

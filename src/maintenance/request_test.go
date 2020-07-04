@@ -56,13 +56,13 @@ import (
 // 	return
 // }
 
-func TestOrder(t *testing.T) {
+func TestCommonOrder(t *testing.T) {
 	cUser := ""
 	receiver := []string{"god", "play"}
 	reason := ""
 	note := ""
 	phone := ""
-	order, e := maintenance.Request(cUser, receiver, reason, phone, note)
+	order, e := maintenance.Request(cUser, receiver, reason, phone, note, 1)
 
 	if e != nil {
 		log.Println(e.Error())

@@ -5,43 +5,48 @@ import (
 	"log"
 	"net/url"
 	"strconv"
-	"streetlity-maintenance/model"
+	"streetlity-maintenance/model/order"
 	"streetlity-maintenance/srpc"
 	"time"
 )
 
 //Accept the order
-func Accept(order_id int64, maintenance_user string) (order model.MaintenanceOrder, e error) {
-	order = model.MaintenanceOrder{Id: order_id}
-	if order, e = model.FindOrder(order); e != nil {
+func Accept(order_id int64, maintenance_user string) (o order.MaintenanceOrder, e error) {
+	o = order.MaintenanceOrder{Id: order_id}
+	if o, e = order.FindOrder(o); e != nil {
 		return
 	}
 
-	if order.Status != model.Waiting {
+	if o.Status != order.Waiting {
 		e = errors.New("This order is not available")
 		return
 	}
 
-	order.MaintenanceUser = maintenance_user
-	order.Timestamp = time.Now().Unix()
-	order.Status = model.Accepted
-	NotifyAccepted(order)
-	e = order.Save()
+	o.MaintenanceUser = maintenance_user
+	o.Timestamp = time.Now().Unix()
+	o.Status = order.Accepted
+	NotifyAccepted(o)
+	e = o.Save()
 	return
 }
 
 //NotifyAccepted send a notify back to common user to confirm that the order is accepted by some one
-func NotifyAccepted(order model.MaintenanceOrder) {
-	data_id := "id:" + strconv.FormatInt(order.Id, 10)
+func NotifyAccepted(o order.MaintenanceOrder) {
+	data_id := "id:" + strconv.FormatInt(o.Id, 10)
 	data_action := "action:" + "Accepted"
-	data_maintenance_user := "maintenance_user:" + order.MaintenanceUser
+	data_maintenance_user := "maintenance_user:" + o.MaintenanceUser
 
-	log.Println("[Order]", "Send notify to", order.CommonUser)
+	log.Println("[Order]", "Send notify to", o.CommonUser)
 	srpc.RequestNotify(url.Values{
-		"id":            {order.CommonUser},
+		"id":            {o.CommonUser},
 		"notify-tittle": {"We got a dream"},
 		"notify-body":   {"A dream is became true"},
 		"data":          {data_id, data_action, data_maintenance_user},
 		"click-action":  {"MaintenanceAcceptNotification"},
 	})
+
+	data := make(map[string]string)
+	data["id"] = strconv.FormatInt(o.Id, 10)
+	data["maintenance_user"] = o.MaintenanceUser
+	srpc.SaveNotification(o.CommonUser, "We got a dream", "No longer dreaming", data)
 }
