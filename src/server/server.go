@@ -111,7 +111,6 @@ func OpenOrderSpace(nsp string) {
 			}
 		})
 	})
-
 	server.OnEvent(nsp, "typed-chat", func(s socketio.Conn, typed_user string) {
 		log.Println(Tag, "typed-chat", "from", typed_user)
 		address := s.RemoteAddr()

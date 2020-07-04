@@ -17,6 +17,7 @@ func RequestOrderValidate(req *http.Request) *pipeline.Stage {
 		Reason           string
 		Phone            string
 		Note             string
+		Type             int
 	}, e error) {
 		form := req.PostForm
 		commonUsers, ok := form["common_user"]
@@ -44,6 +45,16 @@ func RequestOrderValidate(req *http.Request) *pipeline.Stage {
 		notes, ok := form["note"]
 		if ok {
 			str.Note = notes[0]
+		}
+
+		if types, ok := form["type"]; !ok {
+			return str, errors.New("type param is missing")
+		} else {
+			if t, e := strconv.Atoi(types[0]); e != nil {
+				return str, errors.New("type param cannot parse to int")
+			} else {
+				str.Type = t
+			}
 		}
 
 		str.CommonUser = commonUsers[0]

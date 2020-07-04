@@ -1,8 +1,9 @@
-package model
+package order
 
 import (
 	"log"
 	"regexp"
+	"streetlity-maintenance/model"
 
 	"github.com/jinzhu/gorm"
 )
@@ -25,6 +26,7 @@ type MaintenanceOrder struct {
 	Reason          string      `gorm:"column:reason",json:"reason"`
 	Note            string      `gorm:"column:note",json:"note"`
 	Status          OrderStatus `gorm:"column:status"`
+	Type            int         `gorm:"column:order_type"`
 	db              *gorm.DB
 }
 
@@ -32,6 +34,17 @@ const OrderTableName = "maintenance_order"
 
 func (MaintenanceOrder) TableName() string {
 	return OrderTableName
+}
+
+func (o MaintenanceOrder) GetOrderType() string {
+	switch o.Type {
+	case 1:
+		return "Common"
+	case 2:
+		return "Emergency"
+	default:
+		return "Invalid type"
+	}
 }
 
 func (order *MaintenanceOrder) SetReceiver(receivers ...string) {
@@ -57,21 +70,21 @@ func (order MaintenanceOrder) GetReceiver() (receivers []string) {
 
 func CreateOrder(order MaintenanceOrder) (rs MaintenanceOrder, e error) {
 	rs = order
-	if e := Db.Create(&rs).Error; e != nil {
+	if e := model.Db.Create(&rs).Error; e != nil {
 		log.Println("[Database]", "add order", e.Error())
 	}
 
-	rs.db = Db
+	rs.db = model.Db
 	return
 }
 
 func FindOrder(embryo MaintenanceOrder) (order MaintenanceOrder, e error) {
 	order = embryo
-	if e = Db.Find(&order).Error; e != nil {
+	if e = model.Db.Find(&order).Error; e != nil {
 		log.Println("[Database]", "find order", e.Error())
 	}
 
-	order.db = Db
+	order.db = model.Db
 	return
 }
 
