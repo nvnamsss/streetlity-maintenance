@@ -18,7 +18,6 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	Order  order.MaintenanceOrder
 	RoomId string
 }, e error) {
-	log.Println("[Router]", "len", len(maintenance_users))
 	if len(maintenance_users) == 0 {
 		return str, errors.New("there are no maintenance user that receives the order")
 	}
@@ -28,7 +27,6 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	str.Order.Status = order.Waiting
 	str.Order.Type = order_type
 	str.Order.SetReceiver(maintenance_users...)
-	log.Println("[Router]", "len", len(maintenance_users))
 
 	if str.Order, e = order.CreateOrder(str.Order); e != nil {
 		return
@@ -68,6 +66,7 @@ func Request(common_user string, maintenance_users []string, reason string, phon
 	body, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(body, &res)
 
+	log.Print("[Request]", res)
 	if !res.Status {
 		e = errors.New(res.Message)
 	}

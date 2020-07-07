@@ -70,7 +70,8 @@ func DenyOrder(w http.ResponseWriter, req *http.Request) {
 		sres.Response
 		Order order.MaintenanceOrder
 	}
-
+	res.Status = true
+	
 	p := pipeline.NewPipeline()
 	stage := stages.DenyOrderValidate(req)
 	p.First = stage
