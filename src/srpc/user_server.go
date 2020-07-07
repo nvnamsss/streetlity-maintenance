@@ -7,7 +7,7 @@ import (
 )
 
 func RequestNotify(values url.Values) (res *http.Response, e error) {
-	host := "http://" + config.Config.UserHost + "/user/notify"
+	host := "http://" + config.Config.UserHost + "/user/notify/"
 
 	res, e = http.PostForm(host, values)
 
