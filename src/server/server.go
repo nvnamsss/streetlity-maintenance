@@ -128,7 +128,7 @@ func OpenOrderSpace(nsp string) {
 		address := s.RemoteAddr()
 		server.ForEach(nsp, "decline", func(c socketio.Conn) {
 			if c.RemoteAddr() != address {
-				c.Emit("decline")
+				c.Emit("decline", msg)
 			}
 		})
 
