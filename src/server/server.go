@@ -132,9 +132,9 @@ func OpenOrderSpace(nsp string) {
 			}
 		})
 
-		server.ClearRoom(nsp, "join")
-		server.ClearRoom(nsp, "chat")
-		server.ClearRoom(nsp, "information")
+		// server.ClearRoom(nsp, "join")
+		// server.ClearRoom(nsp, "chat")
+		// server.ClearRoom(nsp, "information")
 		delete(chat_stack, nsp)
 	})
 
