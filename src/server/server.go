@@ -41,7 +41,7 @@ func OpenOrderSpace(nsp string) {
 
 		server.ForEach(nsp, "location", func(c socketio.Conn) {
 			if c.RemoteAddr() != address {
-				c.Emit("location-update", data)
+				c.Emit("update-location", data)
 			}
 		})
 	})
@@ -123,13 +123,23 @@ func OpenOrderSpace(nsp string) {
 	})
 
 	server.OnEvent(nsp, "decline", func(s socketio.Conn, msg string) {
-		server.ClearRoom(nsp, "join")
+		log.Println(Tag, "decline", msg)
+		server.ClearRoom(nsp, "join")	
 		server.ClearRoom(nsp, "chat")
 		server.ClearRoom(nsp, "information")
 		delete(chat_stack, nsp)
-
 		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			c.Close()
+		})
+	})
+
+	server.OnEvent(nsp, "complete", func(s socketio.Conn, msg string) {
+		log.Println(Tag, "complete", msg)
+		address := s.RemoteAddr()
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
+			if c.RemoteAddr() != address {
+				c.Emit("completed")
+			}
 		})
 	})
 

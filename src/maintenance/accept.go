@@ -39,8 +39,8 @@ func NotifyAccepted(o order.MaintenanceOrder) {
 	log.Println("[Order]", "Send notify to", o.CommonUser)
 	srpc.RequestNotify(url.Values{
 		"id":            {o.CommonUser},
-		"notify-tittle": {"We got a dream"},
-		"notify-body":   {"A dream is became true"},
+		"notify-tittle": {"Your request is accepted"},
+		"notify-body":   {"A maintenance accepted your order"},
 		"data":          {data_id, data_action, data_maintenance_user},
 		"click-action":  {"MaintenanceAcceptNotification"},
 	})
