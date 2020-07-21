@@ -126,7 +126,7 @@ func OpenOrderSpace(nsp string) {
 		log.Println(Tag, "decline", msg)
 
 		address := s.RemoteAddr()
-		server.ForEach(nsp, "decline", func(c socketio.Conn) {
+		server.ForEach(nsp, "chat", func(c socketio.Conn) {
 			if c.RemoteAddr() != address {
 				c.Emit("decline", msg)
 			}
