@@ -127,10 +127,12 @@ func OpenOrderSpace(nsp string) {
 
 		address := s.RemoteAddr()
 		server.ForEach(nsp, "decline", func(c socketio.Conn) {
-			c.Emit("decline")
+			if c.RemoteAddr() != address {
+				c.Emit("decline")
+			}
 		})
 
-		server.ClearRoom(nsp, "join")	
+		server.ClearRoom(nsp, "join")
 		server.ClearRoom(nsp, "chat")
 		server.ClearRoom(nsp, "information")
 		delete(chat_stack, nsp)
